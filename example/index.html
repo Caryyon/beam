@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Genie Examples</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+        h1, h2 {
+            color: #2d3748;
+        }
+        section {
+            margin-bottom: 3rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .grid-container {
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 1rem;
+            background: #fff;
+        }
+        .grid-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .header { background: #2d3748; color: white; }
+        .sidebar { background: #f7fafc; color: #2d3748; border: 1px solid #e2e8f0; }
+        .main { background: #fff; color: #2d3748; border: 1px solid #e2e8f0; }
+        .ads { background: #f0fff4; color: #2d3748; border: 1px solid #c6f6d5; }
+        .footer { background: #4a5568; color: white; }
+        .gallery-item {
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+        
+        // Grid Genie Component
+        const GridGenie = ({ 
+            children, 
+            columns, 
+            rows, 
+            gap, 
+            columnGap, 
+            rowGap, 
+            alignItems = 'stretch',
+            justifyItems = 'stretch', 
+            alignContent = 'start',
+            justifyContent = 'start',
+            autoFlow = 'row',
+            autoRows,
+            autoColumns,
+            className = '',
+            style = {},
+            minColumnWidth = '200px',
+            responsive = true 
+        }) => {
+            const childrenArray = React.Children.toArray(children);
+            const childCount = childrenArray.length;
+
+            const smartColumns = useMemo(() => {
+                if (columns) return columns;
+                
+                if (responsive && minColumnWidth) {
+                    return `repeat(auto-fit, minmax(${minColumnWidth}, 1fr))`;
+                }
+                
+                if (childCount <= 2) return 2;
+                if (childCount <= 4) return 2;
+                if (childCount <= 6) return 3;
+                if (childCount <= 9) return 3;
+                if (childCount <= 12) return 4;
+                return Math.ceil(Math.sqrt(childCount));
+            }, [columns, responsive, minColumnWidth, childCount]);
+
+            const smartRows = useMemo(() => {
+                if (rows) return rows;
+                if (autoRows) return undefined;
+                
+                const cols = typeof smartColumns === 'number' ? smartColumns : 
+                             smartColumns.includes('auto-fit') ? 1 : 
+                             parseInt(smartColumns.toString()) || 1;
+                
+                return Math.ceil(childCount / cols);
+            }, [rows, autoRows, smartColumns, childCount]);
+
+            const gridStyle = {
+                display: 'grid',
+                gridTemplateColumns: smartColumns.toString(),
+                ...(smartRows && { gridTemplateRows: typeof smartRows === 'number' ? `repeat(${smartRows}, 1fr)` : smartRows }),
+                ...(gap && { gap: typeof gap === 'number' ? `${gap}px` : gap }),
+                ...(columnGap && { columnGap: typeof columnGap === 'number' ? `${columnGap}px` : columnGap }),
+                ...(rowGap && { rowGap: typeof rowGap === 'number' ? `${rowGap}px` : rowGap }),
+                alignItems,
+                justifyItems,
+                alignContent,
+                justifyContent,
+                gridAutoFlow: autoFlow,
+                ...(autoRows && { gridAutoRows: autoRows }),
+                ...(autoColumns && { gridAutoColumns: autoColumns }),
+                ...style,
+            };
+
+            return React.createElement('div', { className, style: gridStyle }, children);
+        };
+
+        // Cell Component
+        const Cell = ({ 
+            children, 
+            column, 
+            row, 
+            columnSpan, 
+            rowSpan, 
+            alignSelf, 
+            justifySelf, 
+            className = '', 
+            style = {} 
+        }) => {
+            const cellStyle = {
+                ...style,
+                ...(column && { gridColumn: typeof column === 'number' ? `${column}` : column }),
+                ...(row && { gridRow: typeof row === 'number' ? `${row}` : row }),
+                ...(columnSpan && { gridColumn: `span ${columnSpan}` }),
+                ...(rowSpan && { gridRow: `span ${rowSpan}` }),
+                ...(alignSelf && { alignSelf }),
+                ...(justifySelf && { justifySelf }),
+            };
+
+            return React.createElement('div', { className, style: cellStyle }, children);
+        };
+
+        // Example App
+        const App = () => {
+            return (
+                <div>
+                    <h1>🧞‍♂️ Grid Genie Examples</h1>
+                    
+                    <section>
+                        <h2>Auto Layout (Smart Detection)</h2>
+                        <p>GridGenie automatically detects the optimal number of columns based on content count.</p>
+                        <div className="grid-container">
+                            <GridGenie gap="1rem">
+                                <div className="grid-item">Item 1</div>
+                                <div className="grid-item">Item 2</div>
+                                <div className="grid-item">Item 3</div>
+                                <div className="grid-item">Item 4</div>
+                                <div className="grid-item">Item 5</div>
+                                <div className="grid-item">Item 6</div>
+                            </GridGenie>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Dashboard Layout</h2>
+                        <p>Using explicit columns and rows with Cell positioning.</p>
+                        <div className="grid-container">
+                            <GridGenie 
+                                columns="200px 1fr 150px" 
+                                rows="60px 1fr 40px" 
+                                gap="1rem"
+                                style={{ height: '400px' }}
+                            >
+                                <Cell column="1 / -1" className="header">Header</Cell>
+                                <Cell className="sidebar">Sidebar</Cell>
+                                <Cell className="main">Main Content</Cell>
+                                <Cell className="ads">Ads</Cell>
+                                <Cell column="1 / -1" className="footer">Footer</Cell>
+                            </GridGenie>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Card Grid (Fixed Columns)</h2>
+                        <p>Responsive disabled, fixed 3 columns.</p>
+                        <div className="grid-container">
+                            <GridGenie columns={3} gap="2rem" responsive={false}>
+                                {[1, 2, 3, 4, 5, 6].map(num => (
+                                    <div key={num} className="card">
+                                        <h3 style={{margin: '0 0 1rem 0'}}>Card {num}</h3>
+                                        <p style={{margin: 0}}>This is card content for item {num}</p>
+                                    </div>
+                                ))}
+                            </GridGenie>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Responsive Gallery</h2>
+                        <p>Responsive mode with minimum column width of 180px.</p>
+                        <div className="grid-container">
+                            <GridGenie minColumnWidth="180px" gap="0.5rem">
+                                {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                                    <div 
+                                        key={num}
+                                        className="gallery-item"
+                                        style={{ 
+                                            background: `hsl(${num * 45}, 70%, 60%)`,
+                                            aspectRatio: '1',
+                                        }}
+                                    >
+                                        {num}
+                                    </div>
+                                ))}
+                            </GridGenie>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Complex Layout with Spanning</h2>
+                        <p>Using columnSpan and rowSpan for complex layouts.</p>
+                        <div className="grid-container">
+                            <GridGenie columns={4} gap="1rem" style={{ height: '300px' }}>
+                                <Cell columnSpan={2} className="grid-item">Wide Header</Cell>
+                                <Cell className="grid-item">Nav 1</Cell>
+                                <Cell className="grid-item">Nav 2</Cell>
+                                <Cell rowSpan={2} className="grid-item">Sidebar</Cell>
+                                <Cell columnSpan={2} className="grid-item">Main Content</Cell>
+                                <Cell className="grid-item">Ad</Cell>
+                                <Cell className="grid-item">Feature 1</Cell>
+                                <Cell className="grid-item">Feature 2</Cell>
+                                <Cell className="grid-item">Feature 3</Cell>
+                            </GridGenie>
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

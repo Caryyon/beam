@@ -1,0 +1,35 @@
+# Source files
+src/
+example/
+.github/
+
+# Config files
+*.config.js
+.eslintrc.js
+jest.config.js
+rollup.config.js
+tsconfig.json
+
+# Development
+node_modules/
+*.lock
+.env*
+
+# Testing
+coverage/
+**/*.test.ts
+**/*.test.tsx
+setupTests.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
