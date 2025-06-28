@@ -156,7 +156,7 @@ export const PerformanceOptimizations: Story = {
           {/* Without optimizations */}
           <div style={{ background: 'white', padding: '1.5rem', borderRadius: '8px', border: '2px solid #fed7d7' }}>
             <h4 style={{ margin: '0 0 1rem 0', color: '#c53030' }}>Without Optimizations</h4>
-            <Beam gap="1rem" optimizeRendering={false}>
+            <Beam gap="1rem">
               {Array.from({ length: 20 }, (_, i) => (
                 <div
                   key={i}
@@ -182,7 +182,7 @@ export const PerformanceOptimizations: Story = {
           {/* With optimizations */}
           <div style={{ background: 'white', padding: '1.5rem', borderRadius: '8px', border: '2px solid #c6f6d5' }}>
             <h4 style={{ margin: '0 0 1rem 0', color: '#38a169' }}>With Optimizations</h4>
-            <Beam gap="1rem" optimizeRendering={true}>
+            <Beam gap="1rem">
               {Array.from({ length: 20 }, (_, i) => (
                 <div
                   key={i}
