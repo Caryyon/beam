@@ -1,5 +1,5 @@
 {
-  "name": "beam",
+  "name": "@caryyon/beam",
   "version": "1.0.0",
   "description": "Ultra-lightweight React grid component. Just 2 props for responsive layouts: minWidth + gap. Smart column detection included.",
   "main": "dist/index.js",
@@ -21,7 +21,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cwolff/beam.git"
+    "url": "git+https://github.com/Caryyon/beam.git"
+  },
+  "publishConfig": {
+    "@caryyon:registry": "https://npm.pkg.github.com"
   },
   "keywords": [
     "react",
@@ -37,9 +40,9 @@
   "author": "Your Name",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cwolff/beam/issues"
+    "url": "https://github.com/Caryyon/beam/issues"
   },
-  "homepage": "https://cwolff.github.io/beam",
+  "homepage": "https://caryyon.github.io/beam",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
